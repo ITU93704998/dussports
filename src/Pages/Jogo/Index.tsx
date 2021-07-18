@@ -29,6 +29,7 @@ export default function Jogo({ navigation, route }) {
   const iddojogo = route.params?.idjogo;
   const totalCadaTime = route.params?.totalcadatime;
   const totalJogadores = dados.length;
+
   const [dadosCriarTabela, setDadosCriarTabela] = useState([]);
   const [dadosCriarTabelaT1, setDadosCriarTabelaT1] = useState([]);
   const [dadosCriarTabelaT2, setDadosCriarTabelaT2] = useState([]);
@@ -62,6 +63,14 @@ export default function Jogo({ navigation, route }) {
 
     db.transaction(tx => {
       tx.executeSql(
+        `select * from user_partida where id_partida = ? and time not in (0, 0) ORDER BY id DESC LIMIT 1`,
+        [iddojogo],
+        (_, { rows: { _array } }) => setDadosCriarTabela(_array)
+      );
+    });
+
+    db.transaction(tx => {
+      tx.executeSql(
         `select * from partida where id = ?;`,
         [iddojogo],
         (_, { rows: { _array } }) => setDadosJogo(_array)
@@ -71,6 +80,7 @@ export default function Jogo({ navigation, route }) {
   }, [att])
 
   function Add() {
+
     if (!name) {
       seterroCampo(true)
     } else {
@@ -82,20 +92,59 @@ export default function Jogo({ navigation, route }) {
         )
       })
 
-      db.transaction(function (tx) {
-        tx.executeSql(
-          'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida) VALUES (?, ?, ?, ?, ?, ? ) ',
-          [name, 0, false, 0, 0, iddojogo],
-          (tx, result) => {
-            if (result.rowsAffected > 0) {
-              setatt(!att)
-              setName('')
-            } else {
-              alert('erro!!')
+
+      if(dadosTabelaATT.length < totalCadaTime*2 ){
+
+        if(parseInt(dadosCriarTabela.map(i => i.time).toString() ) % 2 == 0 ){
+
+          db.transaction(function (tx) {
+            tx.executeSql(
+              'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida) VALUES (?, ?, ?, ?, ?, ? ) ',
+              [name, 1, false, 1, 0, iddojogo],
+              (tx, result) => {
+                if (result.rowsAffected > 0) {
+                  setatt(!att)
+                  setName('')
+                } else {
+                  alert('erro!!')
+                }
+              }
+            )
+          })
+
+        }else{
+          db.transaction(function (tx) {
+            tx.executeSql(
+              'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida) VALUES (?, ?, ?, ?, ?, ? ) ',
+              [name, 1, false, 2, 0, iddojogo],
+              (tx, result) => {
+                if (result.rowsAffected > 0) {
+                  setatt(!att)
+                  setName('')
+                } else {
+                  alert('erro!!')
+                }
+              }
+            )
+          })
+        }
+
+      }else{
+        db.transaction(function (tx) {
+          tx.executeSql(
+            'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida) VALUES (?, ?, ?, ?, ?, ? ) ',
+            [name, 0, false, 0, 0, iddojogo],
+            (tx, result) => {
+              if (result.rowsAffected > 0) {
+                setatt(!att)
+                setName('')
+              } else {
+                alert('erro!!')
+              }
             }
-          }
-        )
-      })
+          )
+        })
+      }
 
     }
   }
@@ -212,89 +261,13 @@ function GerarTime(){
  
   setmodalViewCriando(true) 
 
- 
-
-    
-
-      var ordem = 2;
-      var qvezes = 1;
-
-
-      for (; qvezes < totalCadaTime*2 + 1; qvezes++) {
-
-
-    
-        
-          
-             db.transaction(tx => {
-              tx.executeSql(
-                `select * from user_partida WHERE id_partida=? AND time=? ORDER BY id LIMIT 1;`,
-                [ iddojogo, 0],
-                (_, { rows: { _array } }) => setDadosCriarTabela(_array)
-              );
-            });
-
-            settimedele(dadosCriarTabela.map(t => t.time).toString());
-            setIdTimedele(dadosCriarTabela.map(t => t.id).toString());
-
-         
-        
-
-        function sayHi() {
-
-          if(dadosCriarTabela == []){
-            alert('nulo')
-          }else{
-            console.log(dadosCriarTabela)
-          }
-
-          if(ordem == 2){
-
-            async function AddTime01() {
-              try{
-                console.log(idtimedele)
-              
-              } catch(erro){
-                alert('erro ao gerar time 01')
-              }
-            
-            }
-
-            AddTime01();
-            
-            
-          }else{
-            async function AddTime02() {
-              try{
-                console.log(idtimedele)
-              } catch(erro){
-                alert('erro ao gerar time 02')
-              }
-            
-            }
-
-            AddTime02();
-          }
-        }
-        
-        let myGreeting = setTimeout(sayHi, 2000);
-
-        
-        
-        
-        
-  
-        
-
-          
-          
-      }
-
-  
-
-
+  function sayHi() {
     setmodalViewCriando(false);
-  //navigation.navigate('Partida', {idjogo: iddojogo})
+    navigation.navigate('Partida', {idjogo: iddojogo})
+  }
+  
+  let myGreeting = setTimeout(sayHi, 2000);
+
 }
  
 
@@ -325,24 +298,27 @@ function GerarTime(){
               :
               <View style={{ marginLeft: 20, marginRight: 20, marginTop: 50, justifyContent: 'flex-start'}}>
 
-               <Text>Confirme os dados antes.</Text>
+               <Text style={{fontWeight: 'bold', color: '#696969', fontSize: 20}}>Confirme os dados antes!</Text>
 
                <View>
-                 <Text>Cada time vai ter {dadosJogo.map(item => item.quant_time)} jogadores</Text>
+                 <Text style={{fontWeight: 'bold', fontSize: 15, color: theme.cores.azulescuro}}>Cada time vai ter <Text style={{color: 'red'}}>{dadosJogo.map(item => item.quant_time)}</Text> jogadores</Text>
 
-                 <Text>O primeiro time vai usar o colete {dadosJogo.map(item => item.nomeTime01)}</Text>
+                 <Text style={{fontWeight: 'bold', fontSize: 15, color: theme.cores.azulescuro}}>O primeiro time vai usar o colete <Text style={{color: 'red'}}>{dadosJogo.map(item => item.nomeTime01)}</Text></Text>
 
-                 <Text>O segundo time vai usar o colete {dadosJogo.map(item => item.nomeTime02)}</Text>
+                 <Text style={{fontWeight: 'bold', fontSize: 15, color: theme.cores.azulescuro}}>O segundo time vai usar o colete <Text style={{color: 'red'}}>{dadosJogo.map(item => item.nomeTime02)}</Text></Text>
                </View>
 
                <View>
                  {
                    totalJogadores < totalCadaTime * 2 ?
-                   <View style={{flexDirection:'row', justifyContent:'space-evenly', alignItems: 'center', marginTop: '50%'}}>
-              
-                        <TouchableOpacity onPress={() => {setModalView(false)} } style={{width: '40%', backgroundColor: theme.cores.azulescuro, height: 50, borderRadius: 10, alignItems: 'center', justifyContent: 'center',shadowColor: theme.cores.azulescuro,}}>
-                            <Text style={{color: '#ffff', fontWeight: 'bold', fontSize: 16}}>Cancelar</Text>
-                        </TouchableOpacity>
+                   <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                     <Text style={{fontSize: 12, fontWeight:'bold', color: 'red', marginTop: '25%'}}>Ainda não tem jogadores suficiente para formar time!</Text>
+                      <View style={{flexDirection:'row', justifyContent:'space-evenly', alignItems: 'center', marginTop: '25%'}}>
+                        
+                            <TouchableOpacity onPress={() => {setModalView(false)} } style={{width: '40%', backgroundColor: theme.cores.azulescuro, height: 50, borderRadius: 10, alignItems: 'center', justifyContent: 'center',shadowColor: theme.cores.azulescuro,}}>
+                                <Text style={{color: '#ffff', fontWeight: 'bold', fontSize: 16}}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                    :
                    <View style={{flexDirection:'row', justifyContent:'space-evenly', alignItems: 'center', marginTop: '50%'}}>
@@ -350,7 +326,7 @@ function GerarTime(){
                             <Text style={{color: theme.cores.azulescuro, fontWeight: 'bold', fontSize: 16}}>Cancelar</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {setModalView(false), GerarTime()} } style={{width: '40%', backgroundColor: theme.cores.azulescuro, height: 50, borderRadius: 10, alignItems: 'center', justifyContent: 'center',shadowColor: theme.cores.azulescuro,}}>
-                            <Text style={{color: '#ffff', fontWeight: 'bold', fontSize: 16}}>Gerar Tabelas</Text>
+                            <Text style={{color: '#ffff', fontWeight: 'bold', fontSize: 16}}>Tabelas</Text>
                         </TouchableOpacity>
                    </View>
                  }
@@ -373,22 +349,22 @@ function GerarTime(){
         <View style={{flex: 1, marginTop: 80, backgroundColor: theme.cores.branco,}}>
             <View style={{width: 39, height: 2, borderRadius: 2, backgroundColor: theme.cores.segunda, alignSelf: 'center', marginTop: 13,}} />
 
-            <View style={{justifyContent: 'center', flexDirection: 'column', alignItems: 'center', marginTop: 20}} >
+            <View style={{justifyContent: 'space-evenly', flexDirection: 'row', alignItems: 'center', marginTop: 20}} >
 
-              <Text>Quantos jogadorespor time?</Text>
+             <Text style={{fontWeight: 'bold', fontSize: 15, color: theme.cores.azulescuro}}>Quantos jogadorespor time?</Text>
              <TextInput
                 placeholderTextColor="#ffff"
                 keyboardType="numeric"
                 maxLength = {2}
                 value={attValoresJogadores}
                 onChangeText={ t=> setattValoresJogadores(t)}
-                style = {{backgroundColor: '#dcdcdc', width: '40%', borderRadius: 6, paddingHorizontal: 10, height: 44,marginTop: 5,}}
+                style = {{backgroundColor: '#dcdcdc', width: '20%', borderRadius: 6, paddingHorizontal: 10, height: 34,marginTop: 5,}}
               />
             </View>
 
-            <View style={{justifyContent: 'center', flexDirection: 'column', alignItems: 'center'}} >
+            <View style={{justifyContent: 'center', flexDirection: 'column', alignItems: 'center', marginTop: 10}} >
 
-            <Text>Cor colete primeiro time?</Text>
+            <Text style={{fontWeight: 'bold', fontSize: 15, color: theme.cores.azulescuro}}>Cor colete primeiro time?</Text>
              <TextInput
                 placeholderTextColor="#ffff"
                 value={attcolete01}
@@ -399,7 +375,7 @@ function GerarTime(){
 
             <View style={{justifyContent: 'center', flexDirection: 'column', alignItems: 'center'}} >
 
-              <Text>Cor colete segundo time?</Text>
+              <Text style={{fontWeight: 'bold', fontSize: 15, color: theme.cores.azulescuro}}>Cor colete segundo time?</Text>
              <TextInput
                 placeholderTextColor="#ffff"
                 value={attcolete02}
@@ -530,7 +506,7 @@ function GerarTime(){
                     style={{width: 200, height: 200}}
                     source={require('../../assets/img/criando.gif')}
                         />
-                  <Text style={{color: theme.cores.azulescuro, fontSize:20, fontWeight: 'bold'}}>Criando tabelas ...</Text>
+                  <Text style={{color: theme.cores.azulescuro, fontSize:20, fontWeight: 'bold'}}>Verificando tabelas ...</Text>
                         
                 </View>
               </View>
@@ -542,13 +518,14 @@ function GerarTime(){
        </View>
 
        </Modal>
-       <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginHorizontal: 10 }}>
+      
+       <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginHorizontal: 10 , marginTop: '2%'}}>
          <TouchableOpacity onPress={() => setmodalViewDelete(true)} style={{}}>
           <MaterialIcons name="delete" size={30} color='#F08080' />
          </TouchableOpacity>
 
-          <TouchableOpacity style={{backgroundColor: theme.cores.azulescuro, padding: 5, borderRadius: 6, alignItems: 'center'}} onPress={() => setModalView(true)} >
-            <Text style={{color: theme.cores.branco, fontSize: 15, fontWeight:'bold'}}> Gerar Tebela de Time </Text>
+          <TouchableOpacity style={{backgroundColor: theme.cores.azulescuro, padding: 5, borderRadius: 6, alignItems: 'center', width: '50%'}} onPress={() => setModalView(true)} >
+            <Text style={{color: theme.cores.branco, fontSize: 15, fontWeight:'bold',}}> Tebela de Time </Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {
@@ -611,7 +588,7 @@ function GerarTime(){
              
               <View style={{ width: '33%',  flexDirection: 'row', justifyContent:'flex-start', alignItems: 'center' }}>
                 <Text style={{fontWeight: 'bold', fontSize: 15, color: theme.cores.azulescuro}}>
-                <MaterialIcons name="edit" size={12} color="#696969" /> {item.time}</Text>
+                <MaterialIcons name="edit" size={12} color="#696969" /> {item.name}</Text>
               </View>
 
               <View style={{ width: '33%', alignItems: 'flex-end'}}> 

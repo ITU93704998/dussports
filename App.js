@@ -6,7 +6,7 @@ import Home from './src/Pages/Home/index';
 import Jogo from './src/Pages/Jogo/Index';
 import Config from './src/Pages/Config/Index';
 import Partida from './src/Pages/Partida/Index';
-
+import { theme } from './src/global/styles/theme';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -21,27 +21,40 @@ export default function App() {
         barStyle='light-content'
         backgroundColor="transparent"
         translucent
+        style="light"
        />
       <Stack.Navigator>
-        <Stack.Screen name="Seus Jogos" component={Home} options={{
-          title: "Seus Jogos",
-          backgroundColor: '#ffff',
-          headerTransparent: true,
-          
+        <Stack.Screen name="Seus Jogos" component={Home}  options={{
+          title: 'Seus Jogos',
+          headerStyle: {
+            backgroundColor: theme.cores.azulescuro,
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },  
        }} />
 
         <Stack.Screen name="Jogo" component={Jogo} options={{
-          title: "Jogos",
-          backgroundColor: '#ffff',
-          headerTransparent: false,
-          
+          title: 'Partida',
+          headerStyle: {
+            backgroundColor: theme.cores.azulescuro,
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },  
        }}/>
 
-        <Stack.Screen name="Partida" component={Partida}ptions={{
-          title: "Partida",
-          backgroundColor: '#ffff',
-          headerTransparent: false,
-          
+        <Stack.Screen name="Partida" component={Partida} options={{
+          title: 'Tabela',
+          headerStyle: {
+            backgroundColor: theme.cores.azulescuro,
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
        }} />
 
         <Stack.Screen name="Confi" component={Config} />

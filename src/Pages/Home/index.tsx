@@ -59,7 +59,7 @@ useEffect(() => {
             db.transaction(function (tx) {
                 tx.executeSql(
                     'INSERT INTO partida (name, data, nomeTime01, nomeTime02, quant_time, total_jogos, controle ) VALUES (?, ?, ?, ? ,? , ?, ?) ',
-                    [name, finaldata, 'Time 01', 'Time 02', nuberJogadoresTime, 0 , 'dussports'],
+                    [name, finaldata, 'Time 01', 'Time 02', nuberJogadoresTime, 1 , 'dussports'],
                     (tx, result) => {
                         if(result.rowsAffected > 0){
                             setatt(!att)
@@ -96,7 +96,7 @@ useEffect(() => {
     }
 
  return (
-   <View style={{flex: 1, backgroundColor: '#ffff', marginTop: '25%'}}>
+   <View style={{flex: 1, backgroundColor: '#fffff', }}>
 
 
        <Modal
@@ -120,7 +120,7 @@ useEffect(() => {
                         maxLength = {2}
                         value={nuberJogadoresTime}
                         onChangeText={ t=> setnuberJogadoresTime(t)}
-                        style = {{backgroundColor: '#dcdcdc',width: '40%', borderRadius: 6, paddingHorizontal: 10, height: 44,marginTop: 5, borderWidth: 2, borderColor: 'red', }}
+                        style = {{backgroundColor: '#dcdcdc',width: '40%', borderRadius: 6, paddingHorizontal: 10, height: 34,marginTop: 5, borderWidth: 2, borderColor: 'red', }}
                         />
                     : 
                         <TextInput 
@@ -129,7 +129,7 @@ useEffect(() => {
                         maxLength = {2}
                         value={nuberJogadoresTime}
                         onChangeText={ t=> setnuberJogadoresTime(t)}
-                        style = {{backgroundColor: '#dcdcdc',width: '40%', borderRadius: 6, paddingHorizontal: 10, height: 44,marginTop: 5, borderWidth: 1, borderColor: '#dcdcdc', }}
+                        style = {{backgroundColor: '#dcdcdc',width: '40%', borderRadius: 6, paddingHorizontal: 10, height: 34,marginTop: 5, borderWidth: 1, borderColor: '#dcdcdc', }}
                         />
                     }
                 </View>
@@ -149,7 +149,7 @@ useEffect(() => {
                         isSelected == true ?
                         <View style={{backgroundColor: '#696969', padding: 10, borderRadius: 6}}>
                         <View style={{flexDirection:'row', justifyContent:'space-evenly', alignItems: 'center'}}>
-                            <Text style={{color:'#ffff', fontSize: 15, fontWeight: 'bold'}}>Cor colete primeiro time:  </Text>
+                            <Text style={{color:'#ffff', fontSize: 15, fontWeight: 'bold'}}>Cor do colete primeiro time:  </Text>
                             <TextInput 
                                 placeholder={'Verde'}
                                 maxLength = {20}
@@ -160,7 +160,7 @@ useEffect(() => {
                         </View>
 
                         <View style={{flexDirection:'row', justifyContent:'space-evenly', alignItems: 'center'}}>
-                            <Text style={{color:'#ffff', fontSize: 15, fontWeight: 'bold'}}>Cor colete segundo time:  </Text>
+                            <Text style={{color:'#ffff', fontSize: 15, fontWeight: 'bold'}}>Cor do colete segundo time:  </Text>
                             <TextInput 
                                 placeholder={'Vermelho'}
                                 maxLength = {20}
@@ -196,14 +196,10 @@ useEffect(() => {
        </Modal>
 
 
-    <View   style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+    <View   style={{flexDirection: 'row', justifyContent: 'space-evenly', marginTop: '2%'}}>
             <TouchableOpacity onPress={() => AbrirRegister()}   style={{backgroundColor: theme.cores.azulescuro, padding: 10, borderRadius: 6, width: '45%',alignItems:'center'}}>
             <Text style={{color: theme.cores.branco, fontSize: 15, fontWeight:'bold'}}>Criar Jogo</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity    style={{backgroundColor: theme.cores.azulescuro, padding: 10, borderRadius: 6,width: '45%',alignItems:'center'}}>
-            <Text style={{color: theme.cores.branco, fontSize: 15, fontWeight:'bold'}}>Criar Grupo</Text>
-        </TouchableOpacity>
     </View>
        
 

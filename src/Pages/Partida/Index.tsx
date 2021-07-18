@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { View , Text, ScrollView, TouchableOpacity, Image, FlatList, Modal} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import Cron from './cron';
+
 import * as SQLite from 'expo-sqlite';
 import { theme } from '../../global/styles/theme';
 
@@ -19,19 +19,9 @@ const [proximo, setProximo] = useState([]);
 
 const [modalView, setModalView] = useState(false);
 
-var min= Math.floor((Math.random() * 10 ) + 1);
+//var min= Math.floor((Math.random() * 10 ) + 1);
 
-console.log(min)
-
-const vezesjogada = 4;
-
-const resposta = [
-  { id: 42, name: 'Italo', vezes: 1,},
-  { id: 412, name: 'Ana', vezes: 2,},
-  { id: 422, name: 'Gomes', vezes: 3,},
-  { id: 432, name: 'Cleiton', vezes: 4,},
-  { id: 442, name: 'Navas', vezes: 1,}
-]
+const vezesjogada = parseInt(dados.map(i => i.vazes_total).toString());
 
 useEffect(() => {
 
@@ -53,16 +43,16 @@ useEffect(() => {
 
   db.transaction(tx => {
     tx.executeSql(
-      `select * from user_partida where time = ?;`,
-      [1],
+      `select * from user_partida where time = ? AND id_partida=?;`,
+      [1, iddojogo],
       (_, { rows: { _array } }) => setPrimeiro(_array)
     );
   });
 
   db.transaction(tx => {
     tx.executeSql(
-      `select * from user_partida where time = ?;`,
-      [2],
+      `select * from user_partida where time = ? AND id_partida=?;`,
+      [2, iddojogo],
       (_, { rows: { _array } }) => setSegundo(_array)
     );
   });
@@ -100,7 +90,7 @@ useEffect(() => {
 
        </Modal>
     
-    <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+    <View style={{flexDirection:'row', justifyContent:'space-around', marginTop: '2%'}}>
     <Text style={{fontWeight: 'bold', color: theme.cores.azulescuro, fontSize: 17,}}>{dadosPartida.map(t => t.nomeTime01)}</Text>
     <Text style={{fontWeight: 'bold', color: theme.cores.azulescuro, fontSize: 17,}}>{dadosPartida.map(t => t.nomeTime02)}</Text>
     </View>
@@ -112,7 +102,7 @@ useEffect(() => {
                   <Text style={{color:'white', fontWeight: 'bold', fontSize: 17}}>1°</Text>
                  </View>
               <FlatList
-                data={resposta}
+                data={primeiro}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
@@ -120,7 +110,7 @@ useEffect(() => {
                   <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 5, marginLeft: 20, marginRight: 20, }}>
                   <Text style={{color: '#fff',fontWeight:'bold',}}>{item.name}  </Text>
                   <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
-                      <Text style={{color: '#dcdcdc',fontWeight:'bold',}}>{item.vezes}</Text>
+                      <Text style={{color: '#dcdcdc',fontWeight:'bold',}}>{item.vazes_total}</Text>
                       <MaterialIcons name="rotate-right" size={14} color="#dcdcdc" />
                   </View>
                   
@@ -147,7 +137,7 @@ useEffect(() => {
             <View style={{alignItems: 'center', flexDirection: 'column', justifyContent: 'center', }}>
                 
               <FlatList
-                data={resposta}
+                data={segundo}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
@@ -155,7 +145,7 @@ useEffect(() => {
                   <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 5, marginLeft: 20, marginRight: 20, }}>
                   <Text style={{color: '#fff',fontWeight:'bold',}}>{item.name}  </Text>
                   <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
-                      <Text style={{color: '#dcdcdc',fontWeight:'bold',}}>{item.vezes}</Text>
+                      <Text style={{color: '#dcdcdc',fontWeight:'bold',}}>{item.vazes_total}</Text>
                       <MaterialIcons name="rotate-right" size={14} color="#dcdcdc" />
                   </View>
                   
@@ -197,12 +187,12 @@ useEffect(() => {
        </View>
        <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
        <FlatList
-                data={resposta}
+                data={proximo}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
 
-                  <TouchableOpacity style={{ marginTop: 5, marginLeft: 20, marginRight: 20,  backgroundColor:item.vezes <= vezesjogada/4 ? '#F08080' : item.vezes <= vezesjogada/2 ? '#B0E0E6' : '#3CB371' , padding: 10, borderRadius: 6 }}>
+                  <TouchableOpacity style={{ marginTop: 5, marginLeft: 20, marginRight: 20,  backgroundColor:item.vezes <= item.vazes_total/4 ? '#F08080' : item.vezes <= item.vazes_total/2 ? '#B0E0E6' : '#3CB371' , padding: 10, borderRadius: 6 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',}} >
                     <View>
                       <Text>{item.name}</Text>
@@ -223,12 +213,12 @@ useEffect(() => {
        </View>
        <View style={{height: 100, flexDirection: 'row', justifyContent: 'center'}}>
            <FlatList
-                data={resposta}
+                data={proximo}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
 
-                  <TouchableOpacity style={{ marginTop: 5, marginLeft: 20, marginRight: 20,  backgroundColor:item.vezes <= vezesjogada/4 ? '#F08080' : item.vezes <= vezesjogada/2 ? '#dcdcdc' : '#3CB371' , padding: 10, borderRadius: 6 }}>
+                  <TouchableOpacity style={{ marginTop: 5, marginLeft: 20, marginRight: 20,  backgroundColor:item.vezes <= item.vazes_total/4 ? '#F08080' : item.vezes <= item.vazes_total/2 ? '#dcdcdc' : '#3CB371' , padding: 10, borderRadius: 6 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',}} >
                     <View>
                       <Text>{item.name}</Text>
