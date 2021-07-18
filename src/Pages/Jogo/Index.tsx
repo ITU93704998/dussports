@@ -88,7 +88,7 @@ export default function Jogo({ navigation, route }) {
 
       db.transaction(tx => {
         tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS user_partida (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, vazes_total INT, pagamento BOOL, time INT, time_antigo INT, id_partida INT )'
+          'CREATE TABLE IF NOT EXISTS user_partida (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, vazes_total INT, pagamento BOOL, time INT, time_antigo INT, id_partida INT, ordem INT, jogando BOLL )'
         )
       })
 
@@ -99,8 +99,8 @@ export default function Jogo({ navigation, route }) {
 
           db.transaction(function (tx) {
             tx.executeSql(
-              'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida) VALUES (?, ?, ?, ?, ?, ? ) ',
-              [name, 1, false, 1, 0, iddojogo],
+              'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida, ordem , jogando) VALUES (?, ?, ?, ?, ?, ?, ?, ? ) ',
+              [name, 1, false, 1, 0, iddojogo, 0 , true],
               (tx, result) => {
                 if (result.rowsAffected > 0) {
                   setatt(!att)
@@ -115,8 +115,8 @@ export default function Jogo({ navigation, route }) {
         }else{
           db.transaction(function (tx) {
             tx.executeSql(
-              'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida) VALUES (?, ?, ?, ?, ?, ? ) ',
-              [name, 1, false, 2, 0, iddojogo],
+              'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida, ordem, jogando) VALUES (?, ?, ?, ?, ?, ?, ?,? ) ',
+              [name, 1, false, 2, 0, iddojogo, 0, true],
               (tx, result) => {
                 if (result.rowsAffected > 0) {
                   setatt(!att)
@@ -132,8 +132,8 @@ export default function Jogo({ navigation, route }) {
       }else{
         db.transaction(function (tx) {
           tx.executeSql(
-            'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida) VALUES (?, ?, ?, ?, ?, ? ) ',
-            [name, 0, false, 0, 0, iddojogo],
+            'INSERT INTO user_partida (name, vazes_total, pagamento, time, time_antigo, id_partida, ordem, jogando) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ',
+            [name, 0, false, 0, 0, iddojogo, 0, true],
             (tx, result) => {
               if (result.rowsAffected > 0) {
                 setatt(!att)
@@ -266,7 +266,7 @@ function GerarTime(){
     navigation.navigate('Partida', {idjogo: iddojogo})
   }
   
-  let myGreeting = setTimeout(sayHi, 2000);
+  let myGreeting = setTimeout(sayHi, 1000);
 
 }
  
@@ -592,9 +592,17 @@ function GerarTime(){
               </View>
 
               <View style={{ width: '33%', alignItems: 'flex-end'}}> 
-              <TouchableOpacity  onPress={() =>{ setIdUserDelete(item.id), setNameUserDelete(item.name), setmodalViewDeleteUser(true) } } style={{marginRight:10}}>
-                  <MaterialIcons name="delete" size={24} color='red' />
+
+              {
+                item.time != 0 ?
+                  <Text style={{fontWeight: 'bold', color: '#5F9EA0', fontSize: 12}}>Jogando ...</Text>
+                :
+                
+                <TouchableOpacity  onPress={() =>{ setIdUserDelete(item.id), setNameUserDelete(item.name), setmodalViewDeleteUser(true) } } style={{marginRight:10}}>
+                    <MaterialIcons name="delete" size={24} color='red' />
                 </TouchableOpacity>
+              }
+              
               </View>
             </View>
           </TouchableOpacity>
